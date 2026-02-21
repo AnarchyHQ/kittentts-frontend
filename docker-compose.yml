@@ -1,0 +1,23 @@
+services:
+  kittentts:
+    build: .
+    container_name: kittentts
+    restart: unless-stopped
+    ports:
+      - "${KITTENTTS_PORT:-5200}:5200"
+    environment:
+      - KITTENTTS_HOST=0.0.0.0
+      - KITTENTTS_PORT=5200
+      - KITTENTTS_DEFAULT_MODEL=${KITTENTTS_DEFAULT_MODEL:-mini-0.8}
+      - KITTENTTS_DEFAULT_VOICE=${KITTENTTS_DEFAULT_VOICE:-Jasper}
+      - KITTENTTS_SAMPLE_RATE=${KITTENTTS_SAMPLE_RATE:-24000}
+    volumes:
+      - model-cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5200/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  model-cache:
